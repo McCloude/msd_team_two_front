@@ -24,7 +24,7 @@ import com.bah.msd.domain.Token;
 @RestController
 @RequestMapping("/register")
 public class RegisterAPI {
-	
+
 	String dataApiHost = "localhost:8080";
 
 	@PostMapping
@@ -33,38 +33,38 @@ public class RegisterAPI {
 			// Reject we'll assign the customer id
 			return ResponseEntity.badRequest().build();
 		}
-		
+
 		String json_string = CustomerFactory.getCustomerAsJSONString(newCustomer);
-		
+
 		postNewCustomerToCustomerAPI(json_string);
-		
+
 		// old code that calls repository directly
 		// newCustomer = repo.save(newCustomer);
-		
+
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 				.buildAndExpand(newCustomer.getId()).toUri();
-		ResponseEntity<?> response = ResponseEntity.created(location).build();
-		return response;
+		return ResponseEntity.created(location).build();
 	}
 
 	private void postNewCustomerToCustomerAPI(String json_string) {
 		try {
-			
-			String apiHost= System.getenv("API_HOST");
-			if(apiHost == null) {
+
+			String apiHost = System.getenv("API_HOST");
+			if (apiHost == null) {
 				apiHost = this.dataApiHost;
 			}
 			URL url = new URL("http://" + apiHost + "/api/customers");
-			
-			//URL url = new URL("http://localhost:8080/api/customers") 
-			
+
+			// URL url = new URL("http://localhost:8080/api/customers")
+
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setDoOutput(true);
 			conn.setRequestMethod("POST");
 			conn.setRequestProperty("Content-Type", "application/json");
-	  		Token token = TokenAPI.getAppUserToken();
-	  		conn.setRequestProperty("authorization", "Bearer " + token.getToken());
-	  		// conn.setRequestProperty("tokencheck", "false");
+
+			Token token = TokenAPI.getAppUserToken();
+			conn.setRequestProperty("authorization", "Bearer " + token.getToken());
+			// conn.setRequestProperty("tokencheck", "false");
 
 			OutputStream os = conn.getOutputStream();
 			os.write(json_string.getBytes());
@@ -85,13 +85,9 @@ public class RegisterAPI {
 			conn.disconnect();
 
 		} catch (MalformedURLException e) {
-
 			e.printStackTrace();
-
 		} catch (IOException e) {
-
 			e.printStackTrace();
-
 		}
 
 	}

@@ -4,10 +4,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class MsdProjectAuthServiceApplication {
+public class App {
 
 	public static void main(String[] args) {
-		SpringApplication.run(MsdProjectAuthServiceApplication.class, args);
+		System.out.println("Starting Application Service ......");
+		SpringApplication.run(App.class, args);
 	}
 
 }

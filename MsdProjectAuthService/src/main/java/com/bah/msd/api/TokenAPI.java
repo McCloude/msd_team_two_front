@@ -6,6 +6,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,75 +25,71 @@ import com.bah.msd.jwt.JWTHelper;
 public class TokenAPI {
 
 	String dataApiHost = "localhost:8080";
-	
-	//private static Key key = AuthFilter.key;	
+
+	// private static Key key = AuthFilter.key;
 	public static Token appUserToken;
-	
+
 	@GetMapping
 	public String getAll() {
 		return "jwt-fake-token-asdfasdfasfa".toString();
 	}
-	
+
 	@PostMapping
-	// public ResponseEntity<?> createTokenForCustomer(@RequestBody Customer customer, HttpRequest request, UriComponentsBuilder uri) {
+	// public ResponseEntity<?> createTokenForCustomer(@RequestBody Customer
+	// customer, HttpRequest request, UriComponentsBuilder uri) {
 	public ResponseEntity<?> createTokenForCustomer(@RequestBody Customer customer) {
-		
+
 		String username = customer.getName();
 		String password = customer.getPassword();
-		
-		if (username != null && username.length() > 0 && password != null && password.length() > 0 && checkPassword(username, password)) {
+
+		if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password) && checkPassword(username, password)) {
 			Token token = createToken(username);
-			ResponseEntity<?> response = ResponseEntity.ok(token);
-			return response;			
+			return ResponseEntity.ok(token);
 		}
 		// bad request
 		return (ResponseEntity<?>) ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		
-	}
-	
-	private boolean checkPassword(String username, String password) {
-		// special case for application user
-		if(username.equals("ApiClientApp") && password.equals("secret")) {
-			return true;
-		}
-		// make call to customer service 
-		Customer cust = getCustomerByNameFromCustomerAPI(username);
-		
-		// compare name and password
-		if(cust != null && cust.getName().equals(username) && cust.getPassword().equals(password)) {
-			return true;				
-		}		
-		return false;
-		
-		// local version of the above code, gets customer from repository
-		/*
-		Iterator<Customer> customers = repo.findAll().iterator();
-		while(customers.hasNext()) {
-			Customer cust = customers.next();
-			if(cust.getName().equals(username) && cust.getPassword().equals(password)) {
-				return true;				
-			}
-		}
-		*/
-		
 
 	}
-	
+
+	private boolean checkPassword(String username, String password) {
+		// special case for application user
+		if (username.equals("ApiClientApp") && password.equals("secret")) {
+			return true;
+		}
+		// make call to customer service
+		Customer cust = getCustomerByNameFromCustomerAPI(username);
+
+		// compare name and password
+		if (cust != null && cust.getName().equals(username) && cust.getPassword().equals(password)) {
+			return true;
+		}
+		return false;
+
+		// local version of the above code, gets customer from repository
+		/*
+		 * Iterator<Customer> customers = repo.findAll().iterator();
+		 * while(customers.hasNext()) { Customer cust = customers.next();
+		 * if(cust.getName().equals(username) && cust.getPassword().equals(password)) {
+		 * return true; } }
+		 */
+
+	}
+
 	public static Token getAppUserToken() {
-		if(appUserToken == null || appUserToken.getToken() == null || appUserToken.getToken().length() == 0) {
+		if (appUserToken == null || StringUtils.isBlank(appUserToken.getToken())) {
 			appUserToken = createToken("ApiClientApp");
 		}
 		return appUserToken;
 	}
-	
-    private static Token createToken(String username) {
-    	String scopes = "com.webage.data.apis";
-    	// special case for application user
-    	if( username.equalsIgnoreCase("ApiClientApp")) {
-    		scopes = "com.webage.auth.apis";
-    	}
-    	String token_string = JWTHelper.createToken(scopes);
-    	
+
+	private static Token createToken(String username) {
+		String scopes = "com.bah.msd.data.apis";
+		// special case for application user
+		if (username.equalsIgnoreCase("ApiClientApp")) {
+			scopes = "com.bah.msd.auth.apis";
+		}
+		String token_string = JWTHelper.createToken(scopes);
+
 		/*
 		 * long fiveHoursInMillis = 1000 * 60 *60 * 5;
 		 * 
@@ -101,21 +98,20 @@ public class TokenAPI {
 		 * Date(System.currentTimeMillis() + fiveHoursInMillis)) .signWith(key)
 		 * .compact();
 		 */
-    	
-    	return new Token(token_string);
-    }
-    
-    
+
+		return new Token(token_string);
+	}
+
 	private Customer getCustomerByNameFromCustomerAPI(String username) {
 		try {
 
-			String apiHost= System.getenv("API_HOST");
-			if(apiHost == null) {
+			String apiHost = System.getenv("API_HOST");
+			if (apiHost == null) {
 				apiHost = this.dataApiHost;
 			}
 			URL url = new URL("http://" + apiHost + "/api/customers/byname/" + username);
-			
-			//URL url = new URL("http://localhost:8080/api/customers/byname/" + username);
+
+			// URL url = new URL("http://localhost:8080/api/customers/byname/" + username);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("GET");
 			conn.setRequestProperty("Accept", "application/json");
@@ -126,8 +122,8 @@ public class TokenAPI {
 				return null;
 			} else {
 				BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
-				String output = "";
-				String out = "";
+				String output = StringUtils.EMPTY;
+				String out = StringUtils.EMPTY;
 				while ((out = br.readLine()) != null) {
 					output += out;
 				}
@@ -144,7 +140,6 @@ public class TokenAPI {
 			return null;
 		}
 
-	}  	
+	}
 
-}    
-
+}

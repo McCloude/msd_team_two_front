@@ -4,37 +4,26 @@ import org.json.JSONObject;
 
 public class CustomerFactory {
 	
-	public static Customer getCustomer(String json_string){
-		
-        // parsing file "JSONExample.json" 
-        JSONObject jobj = new org.json.JSONObject(json_string); 
+	public static Customer getCustomer(String jsonString){
+        JSONObject jsonObject = new org.json.JSONObject(jsonString); 
           
-        // getting firstName and lastName 
-        int id = (int) jobj.get("id");
-        String name = (String) jobj.get("name"); 
-        String email = (String) jobj.get("email"); 
-        String password = (String) jobj.get("password"); 
+        long id = (long) jsonObject.get("id");
+        String name = (String) jsonObject.get("name"); 
+        String email = (String) jsonObject.get("email"); 
+        String password = (String) jsonObject.get("password"); 
 		
-		// create customer object
-		Customer cust = new Customer();
-		cust.setName(name);
-		cust.setId(id);
-		cust.setEmail(email);
-		cust.setPassword(password);
-		return cust;
+		return new Customer(id, name, password, email);
 	}
 	
 	public static String getCustomerAsJSONString(Customer customer) {
-        JSONObject jo = new JSONObject(); 
+        JSONObject jsonObject = new JSONObject(); 
         
-        // putting data to JSONObject 
-        jo.put("name", customer.getName()); 
-        jo.put("email", customer.getEmail());
-        jo.put("password", customer.getPassword());
-        jo.put("id", customer.getId());
+        jsonObject.put("name", customer.getName()); 
+        jsonObject.put("email", customer.getEmail());
+        jsonObject.put("password", customer.getPassword());
+        jsonObject.put("id", customer.getId());
         
-        String out = jo.toString();
-        return out;
+        return jsonObject.toString();
 	}
 
 }
