@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bah.msd.domain.Customer;
-import com.bah.msd.domain.CustomerFactory;
 import com.bah.msd.domain.Token;
-import com.bah.msd.jwt.JWTHelper;
+import com.bah.msd.util.CustomerFactory;
+import com.bah.msd.util.JWTHelper;
 
 @RestController
 @RequestMapping("/token")

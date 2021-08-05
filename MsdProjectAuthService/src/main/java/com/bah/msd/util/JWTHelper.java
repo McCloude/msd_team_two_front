@@ -1,4 +1,4 @@
-package com.bah.msd.jwt;
+package com.bah.msd.util;
 
 import java.util.Date;
 import java.util.Map;
@@ -40,7 +40,8 @@ public class JWTHelper {
 		    JWTVerifier verifier = JWT.require(algorithm)
 		        .withIssuer("me@me.com")
 		        .build(); 
-		    DecodedJWT jwt = verifier.verify(token);
+		    @SuppressWarnings("unused")
+			DecodedJWT jwt = verifier.verify(token);
 		    return true;
 		} catch (JWTVerificationException exception){
 			return false;

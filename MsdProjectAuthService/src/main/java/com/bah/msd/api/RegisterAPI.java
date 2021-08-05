@@ -18,8 +18,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.bah.msd.domain.Customer;
-import com.bah.msd.domain.CustomerFactory;
 import com.bah.msd.domain.Token;
+import com.bah.msd.util.CustomerFactory;
 
 @RestController
 @RequestMapping("/register")

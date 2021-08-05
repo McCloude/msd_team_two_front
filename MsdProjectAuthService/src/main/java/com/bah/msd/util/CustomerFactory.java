@@ -1,6 +1,8 @@
-package com.bah.msd.domain;
+package com.bah.msd.util;
 
 import org.json.JSONObject;
+
+import com.bah.msd.domain.Customer;
 
 public class CustomerFactory {
 	
