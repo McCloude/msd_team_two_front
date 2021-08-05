@@ -30,23 +30,18 @@ public class RegisterAPI {
 	@PostMapping
 	public ResponseEntity<?> registerCustomer(@RequestBody Customer newCustomer, UriComponentsBuilder uri) {
 		if (newCustomer.getId() != 0 || newCustomer.getName() == null || newCustomer.getEmail() == null) {
-			// Reject we'll assign the customer id
 			return ResponseEntity.badRequest().build();
 		}
 
 		String json_string = CustomerFactory.getCustomerAsJSONString(newCustomer);
-
 		postNewCustomerToCustomerAPI(json_string);
-
-		// old code that calls repository directly
-		// newCustomer = repo.save(newCustomer);
 
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 				.buildAndExpand(newCustomer.getId()).toUri();
 		return ResponseEntity.created(location).build();
 	}
 
-	private void postNewCustomerToCustomerAPI(String json_string) {
+	private void postNewCustomerToCustomerAPI(String jsonString) {
 		try {
 
 			String apiHost = System.getenv("API_HOST");
@@ -55,8 +50,6 @@ public class RegisterAPI {
 			}
 			URL url = new URL("http://" + apiHost + "/api/customers");
 
-			// URL url = new URL("http://localhost:8080/api/customers")
-
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setDoOutput(true);
 			conn.setRequestMethod("POST");
@@ -64,10 +57,9 @@ public class RegisterAPI {
 
 			Token token = TokenAPI.getAppUserToken();
 			conn.setRequestProperty("authorization", "Bearer " + token.getToken());
-			// conn.setRequestProperty("tokencheck", "false");
 
 			OutputStream os = conn.getOutputStream();
-			os.write(json_string.getBytes());
+			os.write(jsonString.getBytes());
 			os.flush();
 
 			if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED) {

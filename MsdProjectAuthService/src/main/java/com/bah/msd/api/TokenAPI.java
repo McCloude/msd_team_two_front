@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bah.msd.domain.Customer;
@@ -24,7 +25,7 @@ import com.bah.msd.util.JWTHelper;
 @RequestMapping("/token")
 public class TokenAPI {
 
-	String dataApiHost = "localhost:8080";
+	private static final String DATA_API_HOST = "localhost:8080";
 
 	// private static Key key = AuthFilter.key;
 	public static Token appUserToken;
@@ -64,15 +65,6 @@ public class TokenAPI {
 			return true;
 		}
 		return false;
-
-		// local version of the above code, gets customer from repository
-		/*
-		 * Iterator<Customer> customers = repo.findAll().iterator();
-		 * while(customers.hasNext()) { Customer cust = customers.next();
-		 * if(cust.getName().equals(username) && cust.getPassword().equals(password)) {
-		 * return true; } }
-		 */
-
 	}
 
 	public static Token getAppUserToken() {
@@ -88,18 +80,8 @@ public class TokenAPI {
 		if (username.equalsIgnoreCase("ApiClientApp")) {
 			scopes = "com.bah.msd.auth.apis";
 		}
-		String token_string = JWTHelper.createToken(scopes);
-
-		/*
-		 * long fiveHoursInMillis = 1000 * 60 *60 * 5;
-		 * 
-		 * String token_string = Jwts.builder() .setSubject(username)
-		 * .setIssuer("me@me.com") .claim("scopes",scopes) .setExpiration(new
-		 * Date(System.currentTimeMillis() + fiveHoursInMillis)) .signWith(key)
-		 * .compact();
-		 */
-
-		return new Token(token_string);
+		String tokenString = JWTHelper.createToken(scopes);
+		return new Token(tokenString);
 	}
 
 	private Customer getCustomerByNameFromCustomerAPI(String username) {
@@ -107,14 +89,14 @@ public class TokenAPI {
 
 			String apiHost = System.getenv("API_HOST");
 			if (apiHost == null) {
-				apiHost = this.dataApiHost;
+				apiHost = DATA_API_HOST;
 			}
 			URL url = new URL("http://" + apiHost + "/api/customers/byname/" + username);
 
-			// URL url = new URL("http://localhost:8080/api/customers/byname/" + username);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			conn.setRequestMethod("GET");
+			conn.setRequestMethod(RequestMethod.GET.name());
 			conn.setRequestProperty("Accept", "application/json");
+			
 			Token token = getAppUserToken();
 			conn.setRequestProperty("authorization", "Bearer " + token.getToken());
 
